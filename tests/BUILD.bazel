@@ -1,0 +1,80 @@
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+
+# buildifier: disable=bzl-visibility
+load("//kubectl/private:versions.bzl", "DEFAULT_VERSION")
+
+# Must match the `kubectl_dev.toolchain(name = "kubectl_pinned", ...)` tag in MODULE.bazel.
+PINNED_VERSION = "1.36.5"
+
+# The host repository created by the default `kubectl.toolchain()` tag.
+sh_test(
+    name = "host_version_test",
+    size = "small",
+    srcs = ["version_test.sh"],
+    data = ["@kubectl"],
+    env = {
+        "EXPECTED_VERSION": "v" + DEFAULT_VERSION,
+        "KUBECTL": "$(rlocationpath @kubectl//:kubectl)",
+    },
+    deps = ["@bazel_tools//tools/bash/runfiles"],
+)
+
+# The `bazel run` launcher in front of the host binary.
+sh_test(
+    name = "launcher_test",
+    size = "small",
+    srcs = ["launcher_test.sh"],
+    data = ["@kubectl"],
+    env = {
+        "KUBECTL": "$(rlocationpath @kubectl//:kubectl)",
+    },
+    deps = ["@bazel_tools//tools/bash/runfiles"],
+)
+
+# Toolchain resolution and the `KUBECTL` make variable.
+genrule(
+    name = "genrule_version",
+    outs = ["genrule_version.json"],
+    cmd = "$(KUBECTL) version --client --output json > $@",
+    toolchains = ["//kubectl:current_toolchain"],
+)
+
+sh_test(
+    name = "genrule_version_test",
+    size = "small",
+    srcs = ["version_test.sh"],
+    data = [":genrule_version"],
+    env = {
+        "EXPECTED_VERSION": "v" + DEFAULT_VERSION,
+        "VERSION_JSON": "$(rlocationpath :genrule_version)",
+    },
+    deps = ["@bazel_tools//tools/bash/runfiles"],
+)
+
+# The `KUBECTL_RLOCATIONPATH` make variable, resolved through runfiles.
+sh_test(
+    name = "rlocationpath_version_test",
+    size = "small",
+    srcs = ["version_test.sh"],
+    data = ["//kubectl:current_toolchain"],
+    env = {
+        "EXPECTED_VERSION": "v" + DEFAULT_VERSION,
+        "KUBECTL": "$(KUBECTL_RLOCATIONPATH)",
+    },
+    toolchains = ["//kubectl:current_toolchain"],
+    deps = ["@bazel_tools//tools/bash/runfiles"],
+)
+
+# A version without checksums in `kubectl/private/versions.bzl`, resolved by the
+# extension at fetch time (and persisted as lockfile facts on Bazel 8.5+).
+sh_test(
+    name = "pinned_version_test",
+    size = "small",
+    srcs = ["version_test.sh"],
+    data = ["@kubectl_pinned//:kubectl"],
+    env = {
+        "EXPECTED_VERSION": "v" + PINNED_VERSION,
+        "KUBECTL": "$(rlocationpath @kubectl_pinned//:kubectl)",
+    },
+    deps = ["@bazel_tools//tools/bash/runfiles"],
+)

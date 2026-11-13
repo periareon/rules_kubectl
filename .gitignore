@@ -1,0 +1,6 @@
+# Bazel
+/bazel-*
+user.bazelrc
+
+# Rendered by //docs:publish_book
+/docs/book

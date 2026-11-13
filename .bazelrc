@@ -1,0 +1,20 @@
+###############################################################################
+## Incompatibility flags
+###############################################################################
+
+# https://github.com/bazelbuild/bazel/issues/8195
+build --incompatible_disallow_empty_glob=true
+
+# https://github.com/bazelbuild/bazel/issues/23043.
+build --incompatible_autoload_externally=
+
+# https://github.com/bazelbuild/bazel/issues/12821
+build --nolegacy_external_runfiles
+
+###############################################################################
+
+# Disable network access in sandboxes by default.
+build --sandbox_default_allow_network=false
+
+# Local overrides.
+try-import %workspace%/user.bazelrc

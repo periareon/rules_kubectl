@@ -1,0 +1,17 @@
+exports_files(
+    [
+        "MODULE.bazel",
+        "README.md",
+    ],
+    visibility = ["//:__subpackages__"],
+)
+
+alias(
+    name = "buildifier.check",
+    actual = "//tools/buildifier:check",
+)
+
+alias(
+    name = "buildifier.fix",
+    actual = "//tools/buildifier:fix",
+)

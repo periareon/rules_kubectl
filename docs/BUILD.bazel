@@ -1,0 +1,45 @@
+load("@rules_rust_mdbook//:defs.bzl", "mdbook", "mdbook_server")
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
+
+stardoc(
+    name = "defs",
+    out = "src/defs.md",
+    input = "//kubectl:defs.bzl",
+    table_of_contents_template = "@stardoc//stardoc:templates/markdown_tables/table_of_contents.vm",
+    deps = ["//kubectl:defs"],
+)
+
+stardoc(
+    name = "extensions",
+    out = "src/extensions.md",
+    input = "//kubectl:extensions.bzl",
+    table_of_contents_template = "@stardoc//stardoc:templates/markdown_tables/table_of_contents.vm",
+    deps = ["//kubectl:extensions"],
+)
+
+mdbook(
+    name = "book",
+    srcs = glob(["src/**/*.md"]) + [
+        ":defs",
+        ":extensions",
+    ],
+    book = "book.toml",
+)
+
+alias(
+    name = "docs",
+    actual = ":book",
+)
+
+mdbook_server(
+    name = "server",
+    book = ":book",
+)
+
+sh_binary(
+    name = "publish_book",
+    srcs = ["publish_book.sh"],
+    data = [":book"],
+    env = {"BOOK_DIR": "$(rootpath :book)"},
+)

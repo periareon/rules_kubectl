@@ -1,0 +1,17 @@
+# {version}
+
+```python
+bazel_dep(name = "rules_kubectl", version = "{version}")
+```
+
+Without the Bazel Central Registry:
+
+```python
+archive_override(
+    module_name = "rules_kubectl",
+    integrity = "sha256-{sha256_base64}",
+    urls = ["https://github.com/periareon/rules_kubectl/releases/download/{version}/rules_kubectl-v{version}.tar.gz"],
+)
+```
+
+Additional documentation can be found at: https://periareon.github.io/rules_kubectl

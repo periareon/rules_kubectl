@@ -1,0 +1,30 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("//kubectl/private:toolchain.bzl", "kubectl_toolchain_alias")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "defs.bzl",
+    "extensions.bzl",
+])
+
+toolchain_type(
+    name = "toolchain_type",
+)
+
+kubectl_toolchain_alias(
+    name = "current_toolchain",
+    tags = ["manual"],
+)
+
+bzl_library(
+    name = "defs",
+    srcs = ["defs.bzl"],
+    deps = ["//kubectl/private:bzl_lib"],
+)
+
+bzl_library(
+    name = "extensions",
+    srcs = ["extensions.bzl"],
+    deps = ["//kubectl/private:bzl_lib"],
+)

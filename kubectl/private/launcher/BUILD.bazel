@@ -1,0 +1,15 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+# Embedded by `kubectl_launcher`, which supplies the kubectl rlocationpath
+# through `x_defs`.
+go_library(
+    name = "launcher",
+    srcs = [
+        "main.go",
+        "run_unix.go",
+        "run_windows.go",
+    ],
+    importpath = "github.com/periareon/rules_kubectl/kubectl/private/launcher",
+    visibility = ["//visibility:public"],
+    deps = ["@rules_go//go/runfiles"],
+)
