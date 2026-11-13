@@ -1,0 +1,295 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Introduction - rules_kubectl</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">rules_kubectl</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/periareon/rules_kubectl/" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="rules_kubectl"><a class="header" href="#rules_kubectl">rules_kubectl</a></h1>
+<p>Bazel rules for a hermetic <a href="https://kubernetes.io/docs/reference/kubectl/"><code>kubectl</code></a>.</p>
+<p>The module does two things and nothing else:</p>
+<ul>
+<li>it fetches <code>kubectl</code> for the host and exposes it as <code>@kubectl//:kubectl</code>
+for <code>bazel run</code>, and</li>
+<li>it defines <code>@rules_kubectl//kubectl:toolchain_type</code> so that any rule set needing
+<code>kubectl</code> in an action can share one binary instead of fetching its own.</li>
+</ul>
+<p>There are no <code>kubectl_apply</code> style rules here. Opinions about kubeconfigs,
+contexts and namespaces belong in the rule sets built on top of the toolchain.</p>
+<h2 id="setup"><a class="header" href="#setup">Setup</a></h2>
+<pre><code class="language-python">bazel_dep(name = "rules_kubectl", version = "0.1.0")
+
+kubectl = use_extension("@rules_kubectl//kubectl:extensions.bzl", "kubectl")
+kubectl.toolchain()
+use_repo(kubectl, "kubectl")
+</code></pre>
+<p><code>rules_kubectl</code> registers the toolchains itself, so no <code>register_toolchains</code>
+call is needed.</p>
+<p>The <code>bazel run</code> launcher in front of <code>kubectl</code> is a small Go program that finds
+the binary through runfiles, so <code>rules_go</code> and a Go SDK are fetched the first
+time it is built.</p>
+<h2 id="running-kubectl"><a class="header" href="#running-kubectl">Running kubectl</a></h2>
+<pre><code class="language-bash">bazel run @kubectl -- get pods --namespace my-namespace
+bazel run @kubectl -- apply -f ./deploy/configmap.yaml
+bazel run @kubectl -- kustomize ./deploy/overlays/dev
+</code></pre>
+<p><code>bazel run</code> passes your environment through, so <code>KUBECONFIG</code>, <code>~/.kube/config</code>
+and the usual <code>--context</code> / <code>--namespace</code> flags behave exactly as they do for
+a locally installed <code>kubectl</code>. The <code>@kubectl//:kubectl</code> target also starts
+<code>kubectl</code> from the directory you ran <code>bazel</code> in rather than from the runfiles
+tree, which is why the relative paths above work.</p>
+<h2 id="pinning-a-version"><a class="header" href="#pinning-a-version">Pinning a version</a></h2>
+<p><code>rules_kubectl</code> ships checksums for a single default version. Clusters more
+than one minor version away from it should pin a matching release:</p>
+<pre><code class="language-python">kubectl.toolchain(version = "1.36.5")
+</code></pre>
+<p>Checksums for versions the module does not know about are looked up from the
+upstream <code>.sha256</code> files while the extension is evaluated. On Bazel 8.5 and
+newer the digests are then stored as facts in <code>MODULE.bazel.lock</code>, so the
+lookup happens once per version and airgapped builds keep working from the
+lockfile. Older Bazel versions repeat the lookup whenever the extension is
+re-evaluated.</p>
+<p>Several versions can live side by side by giving each tag its own repository
+name. Only the first <code>toolchain</code> tag in the root module decides which version
+the registered toolchains serve:</p>
+<pre><code class="language-python">kubectl.toolchain()
+kubectl.toolchain(name = "kubectl_legacy", version = "1.35.6")
+use_repo(kubectl, "kubectl", "kubectl_legacy")
+</code></pre>
+<h2 id="use-in-a-genrule"><a class="header" href="#use-in-a-genrule">Use in a genrule</a></h2>
+<p>The resolved toolchain exposes the binary through two make variables:
+<code>KUBECTL</code> is its execpath, for use in actions, and <code>KUBECTL_RLOCATIONPATH</code> is
+its rlocationpath, for looking it up in runfiles.</p>
+<pre><code class="language-python">genrule(
+    name = "kubectl_version",
+    outs = ["kubectl_version.json"],
+    cmd = "$(KUBECTL) version --client --output json &gt; $@",
+    toolchains = ["@rules_kubectl//kubectl:current_toolchain"],
+)
+
+sh_test(
+    name = "kubectl_version_test",
+    srcs = ["kubectl_version_test.sh"],
+    data = ["@rules_kubectl//kubectl:current_toolchain"],
+    env = {"KUBECTL": "$(KUBECTL_RLOCATIONPATH)"},
+    toolchains = ["@rules_kubectl//kubectl:current_toolchain"],
+)
+</code></pre>
+<h2 id="for-rule-authors"><a class="header" href="#for-rule-authors">For rule authors</a></h2>
+<p>Depend on the toolchain type and read the binary from the resolved
+<code>ToolchainInfo</code>:</p>
+<pre><code class="language-python">def _impl(ctx):
+    toolchain = ctx.toolchains["@rules_kubectl//kubectl:toolchain_type"]
+    ctx.actions.run(
+        executable = toolchain.kubectl,
+        ...
+    )
+
+my_rule = rule(
+    implementation = _impl,
+    toolchains = ["@rules_kubectl//kubectl:toolchain_type"],
+)
+</code></pre>
+<p><code>ToolchainInfo</code> carries <code>kubectl</code> (the binary <code>File</code>) and <code>version</code> (the
+version string, without a leading <code>v</code>).</p>
+<h2 id="updating-the-default-version"><a class="header" href="#updating-the-default-version">Updating the default version</a></h2>
+<pre><code class="language-bash">bazel run //tools:fetch_checksums -- 1.38.0
+</code></pre>
+<p>prints the table entry for <code>kubectl/private/versions.bzl</code>. Add it, update
+<code>DEFAULT_VERSION</code>, and remove the previous entry.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+                            <a rel="next prefetch" href="defs.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+                    <a rel="next prefetch" href="defs.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
