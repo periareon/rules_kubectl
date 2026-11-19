@@ -161,6 +161,8 @@
 <ul>
 <li><code>@kubectl//:kubectl</code> runs the host platform's binary from the directory
 <code>bazel run</code> was invoked in.</li>
+<li><code>kubectl_binary</code> does the same for a fixed <code>kubectl</code> invocation, with
+Bazel-generated files wired into its arguments and environment.</li>
 <li><code>@rules_kubectl//kubectl:toolchain_type</code> is the toolchain type rules consume to run
 <code>kubectl</code> in an action.</li>
 <li><code>@rules_kubectl//kubectl:current_toolchain</code> exposes the resolved binary to
@@ -170,6 +172,10 @@
 <h2 id="rules"><a class="header" href="#rules">Rules</a></h2>
 <ul>
 <li><a href="#kubectl_toolchain">kubectl_toolchain</a></li>
+</ul>
+<h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
+<ul>
+<li><a href="#kubectl_binary">kubectl_binary</a></li>
 </ul>
 <p><a id="kubectl_toolchain"></a></p>
 <h2 id="kubectl_toolchain"><a class="header" href="#kubectl_toolchain">kubectl_toolchain</a></h2>
@@ -209,6 +215,47 @@ sh_test(
 <tr><td style="text-align: left"><a id="kubectl_toolchain-name"></a>name</td><td style="text-align: left">A unique name for this target.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels#target-names">Name</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
 <tr><td style="text-align: left"><a id="kubectl_toolchain-kubectl"></a>kubectl</td><td style="text-align: left">A kubectl binary.</td><td style="text-align: left"><a href="https://bazel.build/concepts/labels">Label</a></td><td style="text-align: left">required</td><td style="text-align: left"></td></tr>
 <tr><td style="text-align: left"><a id="kubectl_toolchain-version"></a>version</td><td style="text-align: left">The version of <code>kubectl</code>, without a leading <code>v</code>. Informational.</td><td style="text-align: left">String</td><td style="text-align: left">optional</td><td style="text-align: left"><code>""</code></td></tr>
+</tbody></table>
+</div>
+<p><a id="kubectl_binary"></a></p>
+<h2 id="kubectl_binary"><a class="header" href="#kubectl_binary">kubectl_binary</a></h2>
+<pre>
+load("@rules_kubectl//kubectl:defs.bzl", "kubectl_binary")
+
+kubectl_binary(<a href="#kubectl_binary-name">name</a>, <a href="#kubectl_binary-args">args</a>, <a href="#kubectl_binary-data">data</a>, <a href="#kubectl_binary-env">env</a>, <a href="#kubectl_binary-kubectl">kubectl</a>, <a href="#kubectl_binary-kwargs">**kwargs</a>)
+</pre>
+<p>An executable that runs <code>kubectl</code> with a fixed set of arguments.</p>
+<p>The target is meant for <code>bazel run</code>. Anything passed after <code>--</code> is appended     to <code>args</code>, and <code>kubectl</code> starts in the directory <code>bazel run</code> was invoked     from, so relative paths on the command line resolve the way they would for     a locally installed <code>kubectl</code>.</p>
+<p>Files Bazel knows about are referenced with <code>$(rlocationpath &lt;label&gt;)</code> in     <code>args</code> and <code>env</code>. The launcher resolves them through runfiles at run time,     which means the executable also works when another binary or test runs it.</p>
+<pre><code class="language-python">load("@rules_kubectl//kubectl:defs.bzl", "kubectl_binary")
+
+kubectl_binary(
+    name = "apply",
+    args = [
+        "apply",
+        "--filename=$(rlocationpath :manifests)",
+    ],
+    data = [":manifests"],
+)
+
+kubectl_binary(
+    name = "staging_pods",
+    args = ["get", "pods"],
+    data = ["staging.kubeconfig"],
+    env = {"KUBECONFIG": "$(rlocationpath staging.kubeconfig)"},
+)
+</code></pre>
+<pre><code class="language-bash">bazel run //deploy:apply -- --namespace my-namespace
+</code></pre>
+<p>Nothing about clusters, contexts or namespaces is decided here; that is     left to the arguments and the environment.</p>
+<p><strong>PARAMETERS</strong></p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: left">Description</th><th style="text-align: left">Default Value</th></tr></thead><tbody>
+<tr><td style="text-align: left"><a id="kubectl_binary-name"></a>name</td><td style="text-align: left">The name of the target.</td><td style="text-align: left">none</td></tr>
+<tr><td style="text-align: left"><a id="kubectl_binary-args"></a>args</td><td style="text-align: left">Arguments for <code>kubectl</code>. <code>$(rlocationpath &lt;label&gt;)</code>             references files from <code>data</code>.</td><td style="text-align: left"><code>[]</code></td></tr>
+<tr><td style="text-align: left"><a id="kubectl_binary-data"></a>data</td><td style="text-align: left">Files <code>kubectl</code> may read at run time.</td><td style="text-align: left"><code>[]</code></td></tr>
+<tr><td style="text-align: left"><a id="kubectl_binary-env"></a>env</td><td style="text-align: left">Environment variables set for <code>kubectl</code>, overriding             inherited values. <code>$(rlocationpath &lt;label&gt;)</code> references files             from <code>data</code>.</td><td style="text-align: left"><code>{}</code></td></tr>
+<tr><td style="text-align: left"><a id="kubectl_binary-kubectl"></a>kubectl</td><td style="text-align: left">A specific kubectl binary. By default the binary of             the resolved toolchain is used.</td><td style="text-align: left"><code>None</code></td></tr>
+<tr><td style="text-align: left"><a id="kubectl_binary-kwargs"></a>kwargs</td><td style="text-align: left">Additional keyword arguments for the underlying             <code>go_binary</code>, such as <code>visibility</code>.</td><td style="text-align: left">none</td></tr>
 </tbody></table>
 </div>
                     </main>
