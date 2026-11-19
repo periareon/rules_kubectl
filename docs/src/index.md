@@ -43,6 +43,33 @@ a locally installed `kubectl`. The `@kubectl//:kubectl` target also starts
 `kubectl` from the directory you ran `bazel` in rather than from the runfiles
 tree, which is why the relative paths above work.
 
+## Running kubectl with generated files
+
+`kubectl_binary` fixes the arguments of a `kubectl` invocation and wires files
+Bazel knows about into them with `$(rlocationpath <label>)`. The files are
+resolved through runfiles at run time, so `bazel run` still starts `kubectl`
+in the directory it was invoked from and anything after `--` is appended.
+
+```python
+load("@rules_kubectl//kubectl:defs.bzl", "kubectl_binary")
+
+kubectl_binary(
+    name = "apply",
+    args = [
+        "apply",
+        "--filename=$(rlocationpath :manifests)",
+    ],
+    data = [":manifests"],
+)
+```
+
+```bash
+bazel run //deploy:apply -- --namespace my-namespace
+```
+
+`env` takes the same references, for example to point `KUBECONFIG` at a file in
+the repository. Clusters, contexts and namespaces stay in your hands.
+
 ## Pinning a version
 
 `rules_kubectl` ships checksums for a single default version. Clusters more

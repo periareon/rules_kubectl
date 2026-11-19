@@ -1,6 +1,6 @@
 load("@rules_go//go:def.bzl", "go_library")
 
-# Embedded by `kubectl_launcher`, which supplies the kubectl rlocationpath
+# Embedded by `kubectl_binary`, which supplies the configuration rlocationpath
 # through `x_defs`.
 go_library(
     name = "launcher",
