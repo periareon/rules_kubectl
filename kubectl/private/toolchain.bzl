@@ -1,17 +1,13 @@
 """kubectl toolchain rules"""
 
-def _rlocationpath(file, workspace_name):
-    """Return the runfiles path of `file`, as `$(rlocationpath)` would."""
-    if file.short_path.startswith("../"):
-        return file.short_path[len("../"):]
-    return "{}/{}".format(workspace_name, file.short_path)
+load(":runfiles.bzl", "rlocationpath")
 
 def _kubectl_toolchain_impl(ctx):
     binary = ctx.file.kubectl
 
     template_variables = platform_common.TemplateVariableInfo({
         "KUBECTL": binary.path,
-        "KUBECTL_RLOCATIONPATH": _rlocationpath(binary, ctx.workspace_name),
+        "KUBECTL_RLOCATIONPATH": rlocationpath(binary, ctx.workspace_name),
     })
 
     default_info = DefaultInfo(
