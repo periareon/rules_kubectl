@@ -207,6 +207,17 @@ kubectl_binary(
 </code></pre>
 <pre><code class="language-bash">bazel run //deploy:apply -- --namespace my-namespace
 </code></pre>
+<p><code>kubectl</code> accepts flags ahead of the verb, so <code>args</code> can fix the file a command
+operates on while leaving the verb to the caller:</p>
+<pre><code class="language-python">kubectl_binary(
+    name = "kubectl",
+    args = ["--filename=$(rlocationpath :manifests)"],
+    data = [":manifests"],
+)
+</code></pre>
+<pre><code class="language-bash">bazel run //deploy:kubectl -- diff
+bazel run //deploy:kubectl -- apply --server-side
+</code></pre>
 <p><code>env</code> takes the same references, for example to point <code>KUBECONFIG</code> at a file in
 the repository. Clusters, contexts and namespaces stay in your hands.</p>
 <h2 id="pinning-a-version"><a class="header" href="#pinning-a-version">Pinning a version</a></h2>
@@ -359,6 +370,16 @@ kubectl_binary(
 )
 </code></pre>
 <pre><code class="language-bash">bazel run //deploy:apply -- --namespace my-namespace
+</code></pre>
+<p><code>kubectl</code> accepts flags ahead of the verb, so <code>args</code> can fix the file a     command operates on while leaving the verb to the caller. Only positional     arguments have to follow the verb:</p>
+<pre><code class="language-python">kubectl_binary(
+    name = "kubectl",
+    args = ["--filename=$(rlocationpath :manifests)"],
+    data = [":manifests"],
+)
+</code></pre>
+<pre><code class="language-bash">bazel run //deploy:kubectl -- diff
+bazel run //deploy:kubectl -- apply --server-side
 </code></pre>
 <p>Nothing about clusters, contexts or namespaces is decided here; that is     left to the arguments and the environment.</p>
 <p><strong>PARAMETERS</strong></p>
