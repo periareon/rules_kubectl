@@ -1,3 +1,4 @@
+load("@rules_go//go:def.bzl", "go_test")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//kubectl:defs.bzl", "kubectl_binary")
 
@@ -113,17 +114,33 @@ kubectl_binary(
     env = {"KUBECONFIG": "$(rlocationpath kubeconfig.yaml)"},
 )
 
-sh_test(
+# `kubectl_binary` with a generated manifest but no verb, which the caller
+# supplies on the command line.
+genrule(
+    name = "manifest",
+    outs = ["manifest.yaml"],
+    cmd = "printf 'apiVersion: v1\\nkind: ConfigMap\\nmetadata:\\n  name: manifest-test\\n' > $@",
+)
+
+kubectl_binary(
+    name = "manifest_kubectl",
+    args = ["--filename=$(rlocationpath :manifest)"],
+    data = [":manifest"],
+)
+
+go_test(
     name = "binary_test",
     size = "small",
-    srcs = ["binary_test.sh"],
+    srcs = ["binary_test.go"],
     data = [
         ":config_view",
         ":configmap_dry_run",
+        ":manifest_kubectl",
     ],
     env = {
         "CONFIGMAP_DRY_RUN": "$(rlocationpath :configmap_dry_run)",
         "CONFIG_VIEW": "$(rlocationpath :config_view)",
+        "MANIFEST_KUBECTL": "$(rlocationpath :manifest_kubectl)",
     },
-    deps = ["@bazel_tools//tools/bash/runfiles"],
+    deps = ["@rules_go//go/runfiles"],
 )

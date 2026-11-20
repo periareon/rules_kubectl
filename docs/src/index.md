@@ -67,6 +67,22 @@ kubectl_binary(
 bazel run //deploy:apply -- --namespace my-namespace
 ```
 
+`kubectl` accepts flags ahead of the verb, so `args` can fix the file a command
+operates on while leaving the verb to the caller:
+
+```python
+kubectl_binary(
+    name = "kubectl",
+    args = ["--filename=$(rlocationpath :manifests)"],
+    data = [":manifests"],
+)
+```
+
+```bash
+bazel run //deploy:kubectl -- diff
+bazel run //deploy:kubectl -- apply --server-side
+```
+
 `env` takes the same references, for example to point `KUBECONFIG` at a file in
 the repository. Clusters, contexts and namespaces stay in your hands.
 
