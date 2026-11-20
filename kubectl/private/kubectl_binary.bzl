@@ -138,6 +138,23 @@ def kubectl_binary(name, args = [], data = [], env = {}, kubectl = None, **kwarg
     bazel run //deploy:apply -- --namespace my-namespace
     ```
 
+    `kubectl` accepts flags ahead of the verb, so `args` can fix the file a \
+    command operates on while leaving the verb to the caller. Only positional \
+    arguments have to follow the verb:
+
+    ```python
+    kubectl_binary(
+        name = "kubectl",
+        args = ["--filename=$(rlocationpath :manifests)"],
+        data = [":manifests"],
+    )
+    ```
+
+    ```bash
+    bazel run //deploy:kubectl -- diff
+    bazel run //deploy:kubectl -- apply --server-side
+    ```
+
     Nothing about clusters, contexts or namespaces is decided here; that is \
     left to the arguments and the environment.
 
